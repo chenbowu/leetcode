@@ -10,32 +10,30 @@
 // 给你 循环 数组 code 和整数密钥 k ，请你返回解密后的结果来拆除炸弹！
 
 export function decrypt(code: number[], k: number): number[] {
-    const len = code.length
-    const answer: number[] = new Array(len);
-    answer.fill(0)
-    if (k === 0) {
-        return answer
+    const n = code.length
+    const ans = new Array(n).fill(0)
+    if (k === 0) return ans
+
+    const newCode = new Array(n * 2).fill(0).map((_, i) => {
+        return code[i % n]
+    });
+    // [1, 2, 3, 4, 1, 2, 3, 4]
+    // k = 2; l = 1; r = k;
+    // k = -2; l = n + k; r = n - 1
+    code = newCode
+    let l = k > 0 ? 1 : n + k
+    let r = k > 0 ? k : n - 1
+    let count = 0
+    for (let i = l; i <= r; i ++) {
+        count += code[i]
+    }
+    for (let i = 0; i < n; i++) {
+        ans[i] = count
+        count -= code[l]
+        count += code[r + 1]
+        l++
+        r++
     }
 
-    for (let i = 0; i < answer.length; i++) {
-        let count = 0
-        let kk = Math.abs(k)
-        let j = 0
-        while (j++ < kk) {
-            let index
-            if (k > 0) {
-                index = i + j
-            } else if (k < 0) {
-                index = i - j
-            }
-            if (index > len - 1) {
-                index = Math.abs(index - len)
-            } else if (index < 0) {
-                index = len + index
-            }
-            count += code[index]
-        }
-        answer[i] = count
-    }
-    return answer
+    return ans
 };
